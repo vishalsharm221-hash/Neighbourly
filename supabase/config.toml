@@ -1,0 +1,8 @@
+# Supabase Project Configuration
+
+[build.functions."hello-world"]
+file = "supabase/functions/hello-world"
+
+[env.local]
+api_url = "http://localhost:54321"
+db_url = "postgresql://postgres:postgres@localhost:54321/postgres"

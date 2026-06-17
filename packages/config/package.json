@@ -1,0 +1,7 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "0.0.1",
+  "description": "Shared ESLint configuration",
+  "private": true,
+  "main": "index.js"
+}
