@@ -7,24 +7,96 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#00A86B", // Nextdoor-like green as primary
-        primaryHover: "#008F5A",
-        primaryLight: "#E6F7F0",
-        secondary: "#1E3A8A", // Deep blue for accent
-        accent: "#F59E0B", // Warm amber for highlights
-        background: "#F8FAFC",
-        card: "#FFFFFF",
-        border: "#E2E8F0",
+        primary: {
+          DEFAULT: "#2563EB",
+          50: "#EFF6FF",
+          100: "#DBEAFE",
+          200: "#BFDBFE",
+          300: "#93C5FD",
+          400: "#60A5FA",
+          500: "#3B82F6",
+          600: "#2563EB",
+          700: "#1D4ED8",
+          800: "#1E40AF",
+          900: "#1E3A8A",
+        },
+        secondary: {
+          DEFAULT: "#14B8A6",
+          50: "#F0FDFA",
+          100: "#CCFBF1",
+          200: "#99F6E4",
+          300: "#5EEAD4",
+          400: "#2DD4BF",
+          500: "#14B8A6",
+          600: "#0D9488",
+          700: "#0F766E",
+          800: "#115E59",
+          900: "#134E4A",
+        },
+        accent: {
+          DEFAULT: "#F97316",
+          50: "#FFF7ED",
+          100: "#FFEDD5",
+          200: "#FED7AA",
+          300: "#FDBA74",
+          400: "#FB923C",
+          500: "#F97316",
+          600: "#EA580C",
+          700: "#C2410C",
+          800: "#9A3412",
+          900: "#7C2D12",
+        },
+        success: {
+          DEFAULT: "#22C55E",
+          50: "#F0FDF4",
+          100: "#DCFCE7",
+          200: "#BBF7D0",
+          300: "#86EFAC",
+          400: "#4ADE80",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D",
+        },
+        error: {
+          DEFAULT: "#EF4444",
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
+          600: "#DC2626",
+          700: "#B91C1C",
+          800: "#991B1B",
+          900: "#7F1D1D",
+        },
+        background: "#FFFFFF",
+        surface: "#F8FAFC",
+        border: {
+          DEFAULT: "#E2E8F0",
+          light: "#F1F5F9",
+        },
         text: {
           DEFAULT: "#0F172A",
           secondary: "#64748B",
-          muted: "#94A3B8"
+          muted: "#94A3B8",
         }
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
         'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
         'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
-        'modal': '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        'dropdown': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+        'sidebar': '4px 0 24px -6px rgba(0, 0, 0, 0.12)',
+      },
+      borderRadius: {
+        'xl': '12px',
+        '2xl': '16px',
+        '3xl': '20px',
       }
     },
   },

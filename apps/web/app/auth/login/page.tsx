@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Mail, Loader2 } from 'lucide-react';
-import { Navbar } from '@/components/Navbar';
+import { ArrowLeft, Mail, Loader2, MapPin } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,57 +42,72 @@ export default function LoginPage() {
   if (otpSent) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar isLoggedIn={false} />
-        <main className="max-w-2xl mx-auto px-4 py-20">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-primaryLight rounded-full flex items-center justify-center mx-auto mb-8">
-              <Mail className="w-10 h-10 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold text-text mb-4">Check Your Email</h1>
-            <p className="text-lg text-text-secondary mb-8">
-              We've sent a verification code to <strong className="text-text">{email}</strong>
-            </p>
-            <button
-              onClick={() => router.push('/auth/verify')}
-              className="btn-primary text-lg px-10"
-            >
-              Verify OTP
-            </button>
-            <div className="mt-8">
-              <button
-                onClick={() => setOtpSent(false)}
-                className="text-primary hover:text-primaryHover font-medium"
-              >
-                Use a different email
-              </button>
-            </div>
+        <div className="max-w-md mx-auto px-4 py-12">
+        <Link href="/" className="flex items-center gap-2 text-text-secondary hover:text-text mb-8">
+          <ArrowLeft className="w-5 h-5" />
+          <span>Back to Home</span>
+        </Link>
+
+        <div className="text-center mb-10">
+          <div className="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Mail className="w-10 h-10 text-primary-700" />
           </div>
-        </main>
+          <h1 className="text-3xl font-bold mb-4">Check Your Email</h1>
+          <p className="text-text-secondary text-lg">
+            We've sent a verification code to <span className="font-medium text-text">{email}</span>
+          </p>
+        </div>
+
+        <button
+          onClick={() => router.push('/auth/verify')}
+          className="btn-primary text-lg w-full"
+        >
+          Verify OTP
+        </button>
+
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setOtpSent(false)}
+            className="text-primary-600 hover:text-primary-700 font-medium"
+          >
+            Use a different email
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar isLoggedIn={false} />
-      <main className="max-w-md mx-auto px-4 py-20">
-        <Link href="/" className="inline-flex items-center text-text-secondary hover:text-primary mb-8">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
+      <div className="max-w-md mx-auto px-4 py-12">
+        <Link href="/" className="flex items-center gap-2 text-text-secondary hover:text-text mb-8">
+          <ArrowLeft className="w-5 h-5" />
+          <span>Back to Home</span>
         </Link>
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-text mb-3">Welcome back</h1>
-          <p className="text-text-secondary">Enter your email to receive a verification code</p>
+
+        <div className="text-center mb-10">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-primary-600 rounded-xl flex items-center justify-center">
+              <MapPin className="w-7 h-7 text-white" />
+            </div>
+            <span className="text-3xl font-bold">Neighbourly</span>
+          </div>
+          <h1 className="text-3xl font-bold mb-4">Welcome Back</h1>
+          <p className="text-text-secondary text-lg">
+            Enter your email to receive a verification code
+          </p>
         </div>
+
         <form onSubmit={handleSendOtp} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+            <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-xl text-sm">
               {error}
             </div>
           )}
+
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-text mb-2">
-              Email address
+            <label htmlFor="email" className="input-label">
+              Email Address
             </label>
             <input
               id="email"
@@ -105,6 +119,7 @@ export default function LoginPage() {
               className="input-field"
             />
           </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -116,19 +131,20 @@ export default function LoginPage() {
                 Sending code...
               </span>
             ) : (
-              'Send verification code'
+              'Send Verification Code'
             )}
           </button>
         </form>
-        <div className="mt-8 pt-8 border-t border-border text-center">
+
+        <div className="mt-8 pt-8 border-t border-border-light text-center">
           <p className="text-text-secondary">
             Don't have an account?{' '}
-            <Link href="/auth/signup" className="text-primary font-medium hover:text-primaryHover">
+            <Link href="/auth/signup" className="text-primary-600 hover:text-primary-700 font-medium">
               Join Neighbourly
             </Link>
           </p>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
