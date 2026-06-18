@@ -43,35 +43,36 @@ export default function LoginPage() {
     return (
       <div className="min-h-screen bg-background">
         <div className="max-w-md mx-auto px-4 py-12">
-        <Link href="/" className="flex items-center gap-2 text-text-secondary hover:text-text mb-8">
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Home</span>
-        </Link>
+          <Link href="/" className="flex items-center gap-2 text-text-secondary hover:text-text mb-8">
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Home</span>
+          </Link>
 
-        <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Mail className="w-10 h-10 text-primary-700" />
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Mail className="w-10 h-10 text-primary-700" />
+            </div>
+            <h1 className="text-3xl font-bold mb-4">Check Your Email</h1>
+            <p className="text-text-secondary text-lg">
+              We've sent a verification code to <span className="font-medium text-text">{email}</span>
+            </p>
           </div>
-          <h1 className="text-3xl font-bold mb-4">Check Your Email</h1>
-          <p className="text-text-secondary text-lg">
-            We've sent a verification code to <span className="font-medium text-text">{email}</span>
-          </p>
-        </div>
 
-        <button
-          onClick={() => router.push('/auth/verify')}
-          className="btn-primary text-lg w-full"
-        >
-          Verify OTP
-        </button>
-
-        <div className="mt-8 text-center">
           <button
-            onClick={() => setOtpSent(false)}
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            onClick={() => router.push('/auth/verify')}
+            className="btn-primary text-lg w-full"
           >
-            Use a different email
+            Verify OTP
           </button>
+
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setOtpSent(false)}
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
+              Use a different email
+            </button>
+          </div>
         </div>
       </div>
     );
