@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { verifyOtp } from '@repo/utils';
+import { Navbar } from '@/components/Navbar';
 
 export default function VerifyPage() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function VerifyPage() {
       } else {
         sessionStorage.removeItem('signupEmail');
         sessionStorage.removeItem('loginEmail');
-        router.push(isSignup ? '/feed' : '/feed');
+        router.push('/dashboard');
       }
     } catch (err: any) {
       setError(err.message || 'Verification failed');
@@ -51,55 +52,64 @@ export default function VerifyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-        <Link href="/auth/login" className="flex items-center text-blue-600 mb-6 hover:text-blue-700">
+    <div className="min-h-screen bg-background">
+      <Navbar isLoggedIn={false} />
+      <main className="max-w-md mx-auto px-4 py-20">
+        <Link href="/auth/login" className="inline-flex items-center text-text-secondary hover:text-primary mb-8">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          Back to login
         </Link>
-
-        <h1 className="text-3xl font-bold mb-2">Verify OTP</h1>
-        <p className="text-gray-600 mb-6">
-          We've sent a verification code to <strong>{email}</strong>
-        </p>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleVerify} className="space-y-4">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-text mb-4">Verify OTP</h1>
+          <p className="text-text-secondary">
+            We've sent a verification code to <strong className="text-text">{email}</strong>
+          </p>
+        </div>
+        <form onSubmit={handleVerify} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+              {error}
+            </div>
+          )}
           <div>
-            <label className="block text-sm font-medium mb-2">Enter OTP</label>
+            <label htmlFor="otp" className="block text-sm font-medium text-text mb-2">
+              Enter 6-digit code
+            </label>
             <input
+              id="otp"
               type="text"
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
               placeholder="000000"
               maxLength={6}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl tracking-widest"
+              className="input-field text-center text-2xl tracking-widest"
             />
           </div>
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+            className="btn-primary w-full"
           >
-            {loading ? 'Verifying...' : 'Verify OTP'}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Verifying...
+              </span>
+            ) : (
+              'Verify OTP'
+            )}
           </button>
         </form>
-
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Didn't receive the code?{' '}
-            <button className="text-blue-600 hover:text-blue-700 font-semibold">
-              Resend
+        <div className="mt-8 text-center">
+          <p className="text-text-secondary text-sm">
+            Didn't receive the code?{' '}
+            <button className="text-primary font-medium hover:text-primaryHover">
+              Resend code
             </button>
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,18 +1,34 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Heart, MessageSquare, ShoppingBag, Users, Bell } from 'lucide-react';
-import { supabase, getAreasByCity } from '@repo/utils';
+import Link from 'next/link';
+import { MapPin, Heart, MessageSquare, ShoppingBag, Users, Bell, CheckCircle2, Shield, Sparkles, Menu } from 'lucide-react';
+import { supabase, useLocations } from '@repo/utils';
 import { User } from '@repo/types';
+import { Navbar } from '@/components/Navbar';
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedCity, setSelectedCity] = useState<'Delhi' | 'Noida' | 'Ghaziabad'>('Delhi');
+  const [selectedCityId, setSelectedCityId] = useState<string>('');
+  
+  const { cities, areas, fetchAreasByCity } = useLocations();
 
   useEffect(() => {
     checkUser();
   }, []);
+
+  useEffect(() => {
+    if (cities.length > 0 && !selectedCityId) {
+      setSelectedCityId(cities[0].id);
+    }
+  }, [cities]);
+
+  useEffect(() => {
+    if (selectedCityId) {
+      fetchAreasByCity(selectedCityId);
+    }
+  }, [selectedCityId, fetchAreasByCity]);
 
   async function checkUser() {
     try {
@@ -34,64 +50,134 @@ export default function Home() {
   }
 
   const features = [
-    { icon: MessageSquare, title: 'Feed', description: 'Share and discuss with neighbors' },
-    { icon: ShoppingBag, title: 'Marketplace', description: 'Buy and sell locally' },
-    { icon: Users, title: 'Groups', description: 'Join local communities' },
-    { icon: Bell, title: 'Alerts', description: 'Stay updated with neighborhood news' },
-    { icon: Heart, title: 'Events', description: 'Discover local events' },
-    { icon: MapPin, title: 'Explore', description: 'Find services around you' },
+    { 
+      icon: MessageSquare, 
+      title: 'Community Feed', 
+      description: 'Stay connected with neighbors',
+      color: 'bg-blue-100 text-blue-600'
+    },
+    { 
+      icon: ShoppingBag, 
+      title: 'Local Marketplace', 
+      description: 'Buy & sell nearby',
+      color: 'bg-green-100 text-green-600'
+    },
+    { 
+      icon: Users, 
+      title: 'Neighborhood Groups', 
+      description: 'Join local communities',
+      color: 'bg-purple-100 text-purple-600'
+    },
+    { 
+      icon: Shield, 
+      title: 'Safety Alerts', 
+      description: 'Stay safe together',
+      color: 'bg-orange-100 text-orange-600'
+    },
+    { 
+      icon: Heart, 
+      title: 'Local Events', 
+      description: 'Discover what\'s happening',
+      color: 'bg-pink-100 text-pink-600'
+    },
+    { 
+      icon: MapPin, 
+      title: 'Local Services', 
+      description: 'Find help nearby',
+      color: 'bg-teal-100 text-teal-600'
+    },
   ];
 
-  const cities = ['Delhi', 'Noida', 'Ghaziabad'] as const;
-  const areas = getAreasByCity(selectedCity);
+  const benefits = [
+    { icon: CheckCircle2, text: 'Trusted neighbors only' },
+    { icon: CheckCircle2, text: 'Verified profiles' },
+    { icon: CheckCircle2, text: 'Hyperlocal focus' },
+    { icon: CheckCircle2, text: 'Safe & secure' },
+  ];
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-text-secondary">Loading Neighbourly...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-        {/* Navigation */}
-        <nav className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="text-2xl font-bold text-blue-600">Neighbourly</div>
-            <a
-              href="/auth/login"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Sign In
-            </a>
-          </div>
-        </nav>
+      <div className="min-h-screen bg-background">
+        <Navbar isLoggedIn={false} />
 
         {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-5xl font-bold mb-4 text-gray-900">
-            Connect with Your Neighbors
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Welcome to Neighbourly - Your community hub for sharing, discovering, and growing together in your neighborhood.
-          </p>
-          <a
-            href="/auth/signup"
-            className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-700 inline-block"
-          >
-            Get Started
-          </a>
+        <section className="py-20 lg:py-32">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 pill bg-primaryLight text-primary px-4 py-2 rounded-full mb-6">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="font-medium">For Delhi • Noida • Ghaziabad</span>
+                </div>
+                <h1 className="mt-6 text-5xl lg:text-6xl font-extrabold text-text leading-tight text-balance">
+                  Your <span className="text-primary">Neighborhood</span>,
+                  <br />All in One Place
+                </h1>
+                <p className="mt-6 text-xl text-text-secondary max-w-xl mx-auto lg:mx-0">
+                  Neighbourly connects you with your local community for sharing, helping, and growing together.
+                </p>
+                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <Link href="/auth/signup" className="btn-primary text-lg px-8">
+                    Join Neighbourly
+                  </Link>
+                  <Link href="/auth/login" className="btn-secondary text-lg px-8">
+                    Log In
+                  </Link>
+                </div>
+                <div className="mt-8 flex flex-wrap gap-6 justify-center lg:justify-start gap-x-6">
+                  {benefits.map((benefit, i) => (
+                    <div key={i} className="flex items-center gap-2 text-text-secondary">
+                      <benefit.icon className="w-5 h-5 text-primary" />
+                      <span>{benefit.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="relative">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-4">
+                    <div className="card p-6 h-48 bg-gradient-to-br from-primaryLight to-primary rounded-xl"></div>
+                    <div className="card p-6 h-32 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl"></div>
+                  </div>
+                  <div className="space-y-4 mt-8">
+                    <div className="card p-6 h-32 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl"></div>
+                    <div className="card p-6 h-48 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Features Section */}
-        <section className="bg-white py-20">
+        <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-12 text-center">Features</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-text">Everything Your Neighborhood Needs</h2>
+              <p className="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
+                Built for local connection, safety, and convenience right where you live
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {features.map((feature) => (
-                <div key={feature.title} className="text-center p-6 rounded-lg border border-gray-200 hover:shadow-lg transition">
-                  <feature.icon className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-                  <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
-                </div>
+                <Link key={feature.title} href="#" className="card card-hover p-8 group">
+                  <div className={`w-14 h-14 ${feature.color} rounded-xl flex items-center justify-center mb-6 transition-transform group-hover:scale-105`}>
+                    <feature.icon className="w-7 h-7" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-text-secondary">{feature.description}</p>
+                </Link>
               ))}
             </div>
           </div>
@@ -100,45 +186,80 @@ export default function Home() {
         {/* Cities & Areas Preview */}
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-12 text-center">Available in 3 Cities</h2>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl lg:text-4xl font-bold text-text">Now Live in Your City</h2>
+              <p className="mt-4 text-lg text-text-secondary">
+                Explore neighborhoods across Delhi, Noida, and Ghaziabad
+              </p>
+            </div>
             
             {/* City Tabs */}
-            <div className="flex justify-center gap-4 mb-8">
+            <div className="flex flex-wrap justify-center gap-3 mb-12">
               {cities.map((city) => (
                 <button
-                  key={city}
-                  onClick={() => setSelectedCity(city)}
-                  className={`px-6 py-2 rounded-lg font-semibold transition ${
-                    selectedCity === city
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  key={city.id}
+                  onClick={() => setSelectedCityId(city.id)}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                    selectedCityId === city.id
+                      ? 'bg-primary text-white shadow-lg'
+                      : 'bg-white text-text border border-border hover:border-primary hover:text-primary'
                   }`}
                 >
-                  {city}
+                  {city.name}
                 </button>
               ))}
             </div>
 
             {/* Areas Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {areas.map((area) => (
                 <div
                   key={area.id}
-                  className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition text-center"
+                  className="card card-hover p-6 text-center cursor-pointer"
                 >
-                  <MapPin className="w-5 h-5 mx-auto mb-2 text-green-600" />
-                  <p className="font-semibold text-sm">{area.name}</p>
-                  {area.pincode && <p className="text-xs text-gray-500">{area.pincode}</p>}
+                  <div className="w-10 h-10 bg-primaryLight rounded-full flex items-center justify-center mx-auto mb-3">
+                    <MapPin className="w-5 h-5 text-primary" />
+                  </div>
+                  <p className="font-semibold">{area.name}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
+        {/* CTA Section */}
+        <section className="py-20 bg-primaryLight">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl lg:text-4xl font-bold text-text mb-6">Ready to join your neighborhood?</h2>
+          <p className="text-lg text-text-secondary mb-8 max-w-2xl mx-auto">
+            Thousands of neighbors are already connecting on Neighbourly. Join today and start discovering your local community.
+          </p>
+          <Link href="/auth/signup" className="btn-primary text-lg px-10">
+            Get Started for Free
+          </Link>
+          </div>
+        </section>
+
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-8 mt-20">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <p>&copy; 2024 Neighbourly. Building communities one neighborhood at a time.</p>
+        <footer className="bg-gray-900 text-white py-12">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold">Neighbourly</span>
+              </div>
+              <div className="flex gap-8 text-sm">
+                <Link href="#" className="text-gray-300 hover:text-white transition-colors">About</Link>
+                <Link href="#" className="text-gray-300 hover:text-white transition-colors">Help</Link>
+                <Link href="#" className="text-gray-300 hover:text-white transition-colors">Privacy</Link>
+                <Link href="#" className="text-gray-300 hover:text-white transition-colors">Terms</Link>
+              </div>
+            </div>
+            <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400 text-sm">
+              <p>&copy; 2024 Neighbourly. Building communities one neighborhood at a time.</p>
+            </div>
           </div>
         </footer>
       </div>
@@ -146,41 +267,32 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="text-2xl font-bold text-blue-600">Neighbourly</div>
-          <div className="flex items-center gap-4">
-            <span>Welcome, {user.name}!</span>
-            <button
-              onClick={() => supabase.auth.signOut()}
-              className="text-red-600 hover:text-red-700"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navbar isLoggedIn={true} />
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Welcome to Neighbourly Dashboard</h1>
+      {/* Dashboard Content */}
+      <main className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mb-12">
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name}!</h1>
+          <p className="text-text-secondary">What's happening in your neighborhood today?</p>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
-            <a
+            <Link
               key={feature.title}
-              href={`/${feature.title.toLowerCase()}`}
-              className="p-6 bg-white rounded-lg shadow hover:shadow-lg transition"
+              href={`/${feature.title.toLowerCase().replace(/\s+/g, '-')}`}
+              className="card card-hover p-8 group"
             >
-              <feature.icon className="w-8 h-8 mb-4 text-blue-600" />
-              <h2 className="font-semibold text-lg">{feature.title}</h2>
-              <p className="text-gray-600 text-sm">{feature.description}</p>
-            </a>
+              <div className={`w-14 h-14 ${feature.color} rounded-xl flex items-center justify-center mb-6 transition-transform group-hover:scale-105`}>
+                <feature.icon className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+              <p className="text-text-secondary">{feature.description}</p>
+            </Link>
           ))}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

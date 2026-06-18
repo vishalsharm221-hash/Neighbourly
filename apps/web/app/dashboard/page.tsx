@@ -3,235 +3,156 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, MessageCircle, Share2, Plus, MapPin, LogOut } from 'lucide-react';
-
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  category: string;
-  created_at: string;
-  likes_count: number;
-  comments_count: number;
-  users?: { name: string; avatar_url?: string };
-}
+import { MessageSquare, ShoppingBag, Users, Shield, Heart, MapPin } from 'lucide-react';
+import { supabase, useLocations } from '@repo/utils';
+import { User } from '@repo/types';
+import { Navbar } from '@/components/Navbar';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const { cities, areas } = useLocations();
 
   useEffect(() => {
-    fetchUserAndPosts();
+    checkAuth();
   }, []);
 
-  useEffect(() => {
-    if (selectedCity || selectedCategory !== 'all') {
-      fetchPosts();
-    }
-  }, [selectedCity, selectedCategory]);
-
-  async function fetchUserAndPosts() {
+  async function checkAuth() {
     try {
-      const userRes = await fetch('/api/users');
-      if (!userRes.ok) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
         router.push('/auth/login');
         return;
       }
-      const userData = await userRes.json();
-      setUser(userData.data);
-      setSelectedCity(userData.data?.city || '');
 
-      // Fetch posts
-      fetchPosts(userData.data?.city);
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (!data) {
+        router.push('/auth/complete-profile');
+      } else {
+        setUser(data);
+      }
     } catch (err) {
-      console.error('Error fetching user:', err);
+      console.error('Auth check failed:', err);
       router.push('/auth/login');
     } finally {
       setLoading(false);
     }
   }
 
-  async function fetchPosts(city?: string) {
-    try {
-      const params = new URLSearchParams();
-      if (city) params.append('city', city);
-      if (selectedCategory !== 'all') params.append('category', selectedCategory);
-      params.append('limit', '20');
-
-      const response = await fetch(`/api/posts?${params}`);
-      const data = await response.json();
-      setPosts(data.data || []);
-    } catch (err) {
-      console.error('Error fetching posts:', err);
-    }
-  }
-
-  async function handleLogout() {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  }
+  const features = [
+    {
+      icon: MessageSquare,
+      title: 'Community Feed',
+      description: 'Share and discuss with neighbors',
+      link: '/feed',
+      color: 'bg-blue-100 text-blue-600',
+    },
+    {
+      icon: ShoppingBag,
+      title: 'Local Marketplace',
+      description: 'Buy and sell items locally',
+      link: '/marketplace',
+      color: 'bg-green-100 text-green-600',
+    },
+    {
+      icon: Users,
+      title: 'Neighborhood Groups',
+      description: 'Join local community groups',
+      link: '/groups',
+      color: 'bg-purple-100 text-purple-600',
+    },
+    {
+      icon: Shield,
+      title: 'Safety Alerts',
+      description: 'Stay informed about local safety',
+      link: '/safety',
+      color: 'bg-orange-100 text-orange-600',
+    },
+    {
+      icon: Heart,
+      title: 'Events',
+      description: 'Find local events and activities',
+      link: '/events',
+      color: 'bg-pink-100 text-pink-600',
+    },
+    {
+      icon: MapPin,
+      title: 'Explore',
+      description: 'Discover local services',
+      link: '/explore',
+      color: 'bg-teal-100 text-teal-600',
+    },
+  ];
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Neighbourly</h1>
-          <p className="text-gray-500">Loading...</p>
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-text-secondary">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  const categories = [
-    { id: 'all', label: 'All', icon: '📋' },
-    { id: 'discussion', label: 'Discussion', icon: '💬' },
-    { id: 'safety_alert', label: 'Safety', icon: '🚨' },
-    { id: 'lost_found', label: 'Lost & Found', icon: '🔍' },
-    { id: 'recommendation', label: 'Recommendations', icon: '⭐' },
-    { id: 'event', label: 'Events', icon: '🎉' },
-    { id: 'marketplace', label: 'Marketplace', icon: '🛍️' },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-blue-600">Neighbourly</h1>
-            {user && (
-              <p className="text-sm text-gray-600 flex items-center gap-1">
-                <MapPin className="w-4 h-4" />
-                {user.name}
-              </p>
-            )}
-          </div>
-          <div className="flex gap-4 items-center">
-            <Link href="/profile" className="px-4 py-2 text-gray-700 hover:text-blue-600">
-              Profile
+    <div className="min-h-screen bg-background">
+      <Navbar isLoggedIn={true} />
+      <main className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mb-12">
+          <h1 className="text-3xl font-bold text-text mb-2">
+            Welcome back, {user?.name?.split(' ')[0]}!
+          </h1>
+          <p className="text-text-secondary">
+            Let's check what's happening in your neighborhood today
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {features.map((feature) => (
+            <Link
+              key={feature.title}
+              href={feature.link}
+              className="card card-hover p-8 flex items-start gap-6 group"
+            >
+              <div className={`w-14 h-14 ${feature.color} rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110`}>
+                <feature.icon className="w-7 h-7" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-text mb-2">{feature.title}</h3>
+                <p className="text-text-secondary">{feature.description}</p>
+              </div>
             </Link>
-            <Link href="/messages" className="px-4 py-2 text-gray-700 hover:text-blue-600">
-              Messages
+          ))}
+        </div>
+
+        <div className="card p-8">
+          <h2 className="text-2xl font-bold text-text mb-6">Quick Actions</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button className="btn-primary">
+              Create Post
+            </button>
+            <button className="btn-secondary">
+              Add Listing
+            </button>
+            <Link href="/profile" className="btn-secondary flex items-center justify-center">
+              View Profile
             </Link>
             <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2"
+              onClick={() => supabase.auth.signOut()}
+              className="text-red-600 font-medium hover:bg-red-50 py-3 px-6 rounded-xl transition"
             >
-              <LogOut className="w-4 h-4" />
-              Logout
+              Sign Out
             </button>
           </div>
         </div>
-      </nav>
-
-      <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Feed */}
-        <div className="lg:col-span-2">
-          {/* Create Post Button */}
-          <Link
-            href="/create-post"
-            className="bg-white rounded-lg shadow p-4 mb-6 flex items-center gap-3 hover:shadow-md transition cursor-pointer"
-          >
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <Plus className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="flex-1">
-              <p className="text-gray-600">What's happening in your neighborhood?</p>
-            </div>
-          </Link>
-
-          {/* Posts */}
-          <div className="space-y-4">
-            {posts.length > 0 ? (
-              posts.map((post) => (
-                <div key={post.id} className="bg-white rounded-lg shadow p-4 hover:shadow-md transition">
-                  <div className="flex gap-3 mb-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
-                    <div className="flex-1">
-                      <p className="font-semibold">{post.users?.name || 'Anonymous'}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(post.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                      {post.category}
-                    </span>
-                  </div>
-
-                  <h3 className="font-semibold mb-2">{post.title}</h3>
-                  <p className="text-gray-700 text-sm mb-4">{post.content}</p>
-
-                  <div className="flex justify-between pt-3 border-t text-gray-600">
-                    <button className="flex items-center gap-1 hover:text-blue-600">
-                      <Heart className="w-4 h-4" />
-                      <span className="text-xs">{post.likes_count}</span>
-                    </button>
-                    <button className="flex items-center gap-1 hover:text-blue-600">
-                      <MessageCircle className="w-4 h-4" />
-                      <span className="text-xs">{post.comments_count}</span>
-                    </button>
-                    <button className="flex items-center gap-1 hover:text-blue-600">
-                      <Share2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="bg-white rounded-lg shadow p-8 text-center">
-                <p className="text-gray-500">No posts yet. Be the first to share!</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="lg:col-span-1">
-          {/* Categories */}
-          <div className="bg-white rounded-lg shadow p-4 mb-6">
-            <h2 className="font-semibold mb-4">Categories</h2>
-            <div className="space-y-2">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition ${
-                    selectedCategory === cat.id
-                      ? 'bg-blue-100 text-blue-600 font-semibold'
-                      : 'hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="mr-2">{cat.icon}</span>
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="font-semibold mb-4">Quick Links</h2>
-            <div className="space-y-2">
-              <Link href="/marketplace" className="block px-4 py-2 rounded-lg hover:bg-gray-100">
-                🛍️ Browse Marketplace
-              </Link>
-              <Link href="/groups" className="block px-4 py-2 rounded-lg hover:bg-gray-100">
-                👥 Join Groups
-              </Link>
-              <Link href="/events" className="block px-4 py-2 rounded-lg hover:bg-gray-100">
-                🎉 Local Events
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }
