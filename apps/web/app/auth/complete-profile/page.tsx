@@ -3,27 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { MapPin, Phone, User } from 'lucide-react';
-
-interface City {
-  id: string;
-  name: string;
-}
-
-interface Area {
-  id: string;
-  name: string;
-}
-
-interface Neighborhood {
-  id: string;
-  name: string;
-}
+import { useLocations } from '@repo/utils';
 
 export default function CompleteProfilePage() {
   const router = useRouter();
-  const [cities, setCities] = useState<City[]>([]);
-  const [areas, setAreas] = useState<Area[]>([]);
-  const [neighborhoods, setNeighborhoods] = useState<Neighborhood[]>([]);
+  const {
+    cities,
+    areas,
+    neighborhoods,
+    fetchAreasByCity,
+    fetchNeighborhoodsByArea,
+    loading: locLoading,
+    error: locError,
+  } = useLocations();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -36,56 +28,21 @@ export default function CompleteProfilePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Fetch cities on mount
-  useEffect(() => {
-    fetchCities();
-  }, []);
-
   // Fetch areas when city changes
   useEffect(() => {
     if (formData.city) {
-      fetchAreas(formData.city);
+      fetchAreasByCity(formData.city);
       setFormData((prev) => ({ ...prev, area: '', neighborhood: '' }));
     }
-  }, [formData.city]);
+  }, [formData.city, fetchAreasByCity]);
 
   // Fetch neighborhoods when area changes
   useEffect(() => {
     if (formData.area) {
-      fetchNeighborhoods(formData.area);
+      fetchNeighborhoodsByArea(formData.area);
       setFormData((prev) => ({ ...prev, neighborhood: '' }));
     }
-  }, [formData.area]);
-
-  async function fetchCities() {
-    try {
-      const response = await fetch('/api/cities');
-      const data = await response.json();
-      setCities(data.data || []);
-    } catch (err) {
-      console.error('Error fetching cities:', err);
-    }
-  }
-
-  async function fetchAreas(cityId: string) {
-    try {
-      const response = await fetch(`/api/areas?cityId=${cityId}`);
-      const data = await response.json();
-      setAreas(data.data || []);
-    } catch (err) {
-      console.error('Error fetching areas:', err);
-    }
-  }
-
-  async function fetchNeighborhoods(areaId: string) {
-    try {
-      const response = await fetch(`/api/neighborhoods?areaId=${areaId}`);
-      const data = await response.json();
-      setNeighborhoods(data.data || []);
-    } catch (err) {
-      console.error('Error fetching neighborhoods:', err);
-    }
-  }
+  }, [formData.area, fetchNeighborhoodsByArea]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

@@ -1,25 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { supabase } from '@repo/utils';
-import { getAreasByCity } from '@repo/utils';
+import { ArrowLeft, Loader } from 'lucide-react';
+import { supabase, useLocations } from '@repo/utils';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { cities, areas, fetchAreasByCity, loading: locLoading, error: locError } = useLocations();
   const [step, setStep] = useState<'email' | 'profile'>('email');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [city, setCity] = useState<'Delhi' | 'Noida' | 'Ghaziabad'>('Delhi');
+  const [selectedCityId, setSelectedCityId] = useState('');
   const [area, setArea] = useState('');
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const areas = getAreasByCity(city);
+  // Fetch areas when city changes
+  useEffect(() => {
+    if (selectedCityId) {
+      fetchAreasByCity(selectedCityId);
+      setArea('');
+    }
+  }, [selectedCityId, fetchAreasByCity]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +79,7 @@ export default function SignupPage() {
         email,
         name,
         phone,
-        city,
+        city: selectedArea.city_id,
         area_id: selectedArea.id,
         address,
         verified: false,
@@ -161,16 +167,20 @@ export default function SignupPage() {
             <div>
               <label className="block text-sm font-medium mb-2">City</label>
               <select
-                value={city}
+                value={selectedCityId}
                 onChange={(e) => {
-                  setCity(e.target.value as 'Delhi' | 'Noida' | 'Ghaziabad');
+                  setSelectedCityId(e.target.value);
                   setArea('');
                 }}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
               >
-                <option value="Delhi">Delhi</option>
-                <option value="Noida">Noida</option>
-                <option value="Ghaziabad">Ghaziabad</option>
+                <option value="">Select a city</option>
+                {cities.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -180,12 +190,13 @@ export default function SignupPage() {
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={!selectedCityId || areas.length === 0}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
               >
                 <option value="">Select an area</option>
                 {areas.map((a) => (
                   <option key={a.id} value={a.id}>
-                    {a.name} {a.pincode ? `(${a.pincode})` : ''}
+                    {a.name}
                   </option>
                 ))}
               </select>

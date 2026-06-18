@@ -1,2 +1,3 @@
 export * from './supabase';
-export * from './areas';
+export * from './api';
+export * from './useLocations';
