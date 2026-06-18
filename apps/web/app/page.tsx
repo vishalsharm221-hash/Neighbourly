@@ -15,7 +15,7 @@ import {
   Store,
   Briefcase,
   ArrowRight,
-  Handshake
+  HelpCircle
 } from 'lucide-react';
 import { useLocations } from '@repo/utils';
 
@@ -221,7 +221,7 @@ export default function LandingPage() {
                     {/* Card 4 */}
                     <div className="bg-gradient-to-br from-green-50 to-white p-6 rounded-2xl border border-green-100 card-hover mt-6">
                       <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-4">
-                        <Handshake className="w-6 h-6 text-white" />
+                        <HelpCircle className="w-6 h-6 text-white" />
                       </div>
                       <h4 className="font-semibold text-lg mb-2">Help Request</h4>
                       <p className="text-sm text-text-secondary">Need help moving furniture tomorrow!</p>
